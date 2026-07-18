@@ -103,7 +103,7 @@ const FAMILIAS_DISPONIBLES = Object.keys(FAMILIA_COLORES);
 // ---------- Cargar datos guardados ----------
 function cargarGuardado(){
   try{
-    const guardado = JSON.parse(localStorage.getItem('piramideOlfativa') || '{}');
+    const guardado = JSON.parse(localStorage.getItem('piramideOlfativa_parfumart') || '{}');
     CAMPOS_PERSISTENTES.forEach(c => { if(guardado[c]) $(c).value = guardado[c]; });
     if(guardado.formato) formatoActual = guardado.formato;
     // A propósito NO restauramos perfume, marca, precio, notas ni foto:
@@ -115,7 +115,7 @@ function guardar(){
   const data = {};
   CAMPOS_PERSISTENTES.forEach(c => data[c] = $(c).value);
   data.formato = formatoActual;
-  try{ localStorage.setItem('piramideOlfativa', JSON.stringify(data)); }catch(e){
+  try{ localStorage.setItem('piramideOlfativa_parfumart', JSON.stringify(data)); }catch(e){
     // si falla el guardado local, no es grave: solo no se recordará la próxima vez
   }
 }
