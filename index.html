@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Parfum Art — Pirámide Olfativa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+<div class="app">
+  <div class="panel">
+    <h1>Pirámide Olfativa</h1>
+    <p class="subtitulo">Busca un perfume de tu inventario o edita los detalles a mano.</p>
+
+    <label>Buscar en tu inventario <span class="opcional">(opcional, necesita internet)</span></label>
+    <input type="text" id="buscarInventario" placeholder="Escribe el nombre del perfume..." autocomplete="off">
+    <div id="resultadosInventario" class="resultados-inventario"></div>
+    <div class="ayuda-foto" id="ayudaInventario"></div>
+    <div class="ayuda-foto" id="estadoInventario"></div>
+
+    <button type="button" class="toggle-detalles" id="btnToggleDetalles">
+      <span>Editar detalles manualmente</span>
+      <svg class="toggle-flecha" id="toggleFlecha" width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <div class="detalles-colapsable" id="detallesPanel">
+     <div class="detalles-colapsable-inner">
+      <div class="ayuda-foto">¿Perfume nuevo que no está en tu inventario? No hay problema — llena estos campos a mano, funciona igual.</div>
+
+      <label>Nombre del negocio <span class="opcional">(se guarda solo, se usa como firma)</span></label>
+      <input type="text" id="businessName" placeholder="Parfum Art">
+
+      <label>Nombre del perfume</label>
+      <input type="text" id="perfumeName" placeholder="Ej: Ajwad">
+      <div class="msg-error" id="err-perfumeName">Escribe el nombre del perfume.</div>
+
+      <label>Marca</label>
+      <input type="text" id="brand" placeholder="Ej: Lattafa">
+      <div class="msg-error" id="err-brand">Escribe la marca.</div>
+
+      <label>Familias olfativas <span class="opcional">(opcional, hasta 3)</span></label>
+      <div class="familias-selects">
+        <select id="familia1"></select>
+        <select id="familia2"></select>
+        <select id="familia3"></select>
+      </div>
+
+      <label>Notas de salida <span class="opcional">(separadas por coma)</span></label>
+      <div class="ayuda-foto" id="aromaHint" style="display:none;"></div>
+      <textarea id="salida" placeholder="Ej: Bergamota, Mandarina"></textarea>
+      <div class="msg-error" id="err-salida">Agrega al menos una nota de salida.</div>
+
+      <label>Notas de corazón <span class="opcional">(separadas por coma)</span></label>
+      <textarea id="corazon" placeholder="Ej: Jazmín, Rosa, Azafrán"></textarea>
+      <div class="msg-error" id="err-corazon">Agrega al menos una nota de corazón.</div>
+
+      <label>Notas de fondo <span class="opcional">(separadas por coma)</span></label>
+      <textarea id="fondo" placeholder="Ej: Ámbar, Vainilla, Almizcle"></textarea>
+      <div class="msg-error" id="err-fondo">Agrega al menos una nota de fondo.</div>
+
+      <label>Foto del frasco <span class="opcional">(opcional)</span></label>
+      <div class="foto-btn" id="fotoBtn">
+        <img id="fotoPreviewMini" style="display:none;">
+        <span id="fotoBtnTexto">Toca para subir una foto</span>
+      </div>
+      <input type="file" id="fotoInput" accept="image/*" style="display:none;">
+      <button class="btn btn-secundario" id="btnQuitarFondo" style="display:none; margin-top:8px;">Quitar fondo (automático)</button>
+      <div class="ayuda-foto" id="ayudaFoto"></div>
+
+      <label>Formato de la imagen</label>
+      <div class="formato-toggle">
+        <button id="btnCuadrado" class="activo">Feed (cuadrada)</button>
+        <button id="btnStory">Historia (vertical)</button>
+      </div>
+
+      <button class="btn btn-texto" id="btnReiniciar">Empezar de nuevo</button>
+     </div>
+    </div>
+  </div>
+
+  <div class="preview-wrap">
+
+    <div class="stage">
+      <div id="card">
+        <div class="textura"></div>
+        <div class="marca" id="pv-brand">MARCA</div>
+        <div class="nombre-perfume l" id="pv-nombre">Nombre del perfume</div>
+        <img id="pv-bottle" class="bottle-badge" style="display:none;">
+        <div class="ornamento ornamento-top">
+          <span class="linea"></span>
+          <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><path d="M1 6 H21 M11 6 C11 6 8 2 5 3 M11 6 C11 6 8 10 5 9 M11 6 C11 6 14 2 17 3 M11 6 C11 6 14 10 17 9" stroke-width="1" stroke-linecap="round"/></svg>
+          <span class="linea"></span>
+        </div>
+        <div class="piramide">
+          <div class="nivel">
+            <div class="nivel-titulo">Salida</div>
+            <div class="nivel-notas" id="pv-salida">—</div>
+          </div>
+          <div class="divisor">
+            <span class="linea"></span>
+            <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><path d="M1 6 H21 M11 6 C11 6 8 2 5 3 M11 6 C11 6 8 10 5 9 M11 6 C11 6 14 2 17 3 M11 6 C11 6 14 10 17 9" stroke-width="1" stroke-linecap="round"/></svg>
+            <span class="linea"></span>
+          </div>
+          <div class="nivel">
+            <div class="nivel-titulo">Corazón</div>
+            <div class="nivel-notas" id="pv-corazon">—</div>
+          </div>
+          <div class="divisor">
+            <span class="linea"></span>
+            <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><path d="M1 6 H21 M11 6 C11 6 8 2 5 3 M11 6 C11 6 8 10 5 9 M11 6 C11 6 14 2 17 3 M11 6 C11 6 14 10 17 9" stroke-width="1" stroke-linecap="round"/></svg>
+            <span class="linea"></span>
+          </div>
+          <div class="nivel">
+            <div class="nivel-titulo">Fondo</div>
+            <div class="nivel-notas" id="pv-fondo">—</div>
+          </div>
+        </div>
+        <div class="familias" id="pv-familias" style="display:none;">
+          <div class="familias-barra" id="pv-familias-barra"></div>
+          <div class="familias-etiquetas" id="pv-familias-etiquetas"></div>
+        </div>
+        <div class="ornamento ornamento-bottom">
+          <span class="linea"></span>
+          <svg width="22" height="12" viewBox="0 0 22 12" fill="none"><path d="M1 6 H21 M11 6 C11 6 8 2 5 3 M11 6 C11 6 8 10 5 9 M11 6 C11 6 14 2 17 3 M11 6 C11 6 14 10 17 9" stroke-width="1" stroke-linecap="round"/></svg>
+          <span class="linea"></span>
+        </div>
+        <div class="watermark">
+          <img id="pv-watermark-logo" alt="Logo">
+          <span id="pv-watermark-texto">PARFUM ART</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="acciones-preview">
+      <button class="btn btn-secundario" id="btnDescargar">Descargar imagen</button>
+      <button class="btn btn-primario" id="btnCompartir">Compartir</button>
+    </div>
+    <div class="ayuda-export" id="ayudaExport"></div>
+  </div>
+</div>
+
+<script src="js/inventario-snapshot.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
